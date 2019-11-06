@@ -7,6 +7,7 @@
 #include "Tank.h"
 #include "TankAIController.generated.h"
 
+class UTankAimingComponent;
 
 UCLASS()
 class BATTLETANKS_API ATankAIController : public AAIController
@@ -21,8 +22,9 @@ private:
 
 	virtual void Tick(float DeltaTime) override;
 
-	ATank* GetControlledTank() const;
+	// This is the distance the tank will stop away from its goal
+	float AcceptanceRadius = 3000; // 30m
 
-	ATank* GetPlayerTank() const;
+	UTankAimingComponent* AimingComponent = nullptr;
 
 };

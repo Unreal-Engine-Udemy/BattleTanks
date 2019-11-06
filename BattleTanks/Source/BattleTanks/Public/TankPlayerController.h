@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "TankPlayerController.generated.h"  // must be last include 
 
+class UTankAimingComponent;
 /**
  * 
  */
@@ -29,8 +30,6 @@ private:
 	// get hit location of the aim reticule
 	bool GetSightRayHitLocation( FVector &OutHitLocation) const;
 
-	ATank* GetControlledTank() const; 
-
 	UPROPERTY(EditAnywhere)
 	float CrosshairXLocation = 0.5;
 
@@ -41,5 +40,12 @@ private:
 	float LengthOfView = 1000000;
 
 	bool GetLookVectorHitLocation(FVector& OutHitLocation, FVector* Direction, FVector* CameraWorldLocation) const;
+
+	UTankAimingComponent* AimingComponent = nullptr;
+
+protected:
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Steup")
+	void FoundAimingComponent(UTankAimingComponent* AimComRef);
 	
 };

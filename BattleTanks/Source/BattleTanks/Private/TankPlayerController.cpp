@@ -4,23 +4,19 @@
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "BattleTanks/Public/TankPlayerController.h"
-
+#include "BattleTanks/Public/TankAimingComponent.h"
 
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ATank* ControlledTank = GetControlledTank();
+	ensure(GetPawn());
+	AimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
 
-	if(!ControlledTank)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Tank not possessed!"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Tank %s possessed!"), *(ControlledTank->GetName()));
-	}
+	ensure(AimingComponent);
+	FoundAimingComponent(AimingComponent);
 	
+
 }
 
 // Called every frame
@@ -33,15 +29,13 @@ void ATankPlayerController::Tick(float DeltaTime)
 
 void ATankPlayerController::AimTowardsCrossHair()
 {
-	if (!GetControlledTank()) { return; }
-	
 	FVector HitLocation; //out paramter 
 
+	bool bTest = GetSightRayHitLocation(HitLocation);
 	if (GetSightRayHitLocation(HitLocation))
 	{
-		GetControlledTank()->AimAt(HitLocation);
+		AimingComponent->AimAt(HitLocation);
 	}
-		
 }
 
 bool ATankPlayerController::GetSightRayHitLocation(FVector& OutHitLocation) const
@@ -60,11 +54,6 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector& OutHitLocation) cons
 		return true;
 	}
 	return false;
-}
-
-ATank* ATankPlayerController::GetControlledTank() const
-{
-	return Cast<ATank>(GetPawn());
 }
 
 bool ATankPlayerController::GetLookVectorHitLocation(FVector& OutHitLocation, FVector* Direction, FVector* CameraWorldLocation) const
