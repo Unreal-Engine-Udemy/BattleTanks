@@ -30,6 +30,8 @@ private:
 	// get hit location of the aim reticule
 	bool GetSightRayHitLocation( FVector &OutHitLocation) const;
 
+	void SetPawn(APawn* InPawn);
+
 	UPROPERTY(EditAnywhere)
 	float CrosshairXLocation = 0.5;
 

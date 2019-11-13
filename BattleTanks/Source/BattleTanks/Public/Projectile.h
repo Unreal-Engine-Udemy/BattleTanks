@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Projectile.generated.h"
 
 class UProjectileMovementComponent;
+class URadialForceComponent;
 
 UCLASS()
 class BATTLETANKS_API AProjectile : public AActor
@@ -30,5 +32,30 @@ public:
 private:
 
 	UProjectileMovementComponent* ProjectileMovementComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	UStaticMeshComponent* CollisionMesh = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	UParticleSystemComponent* LaunchBlast = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	UParticleSystemComponent* ImpactBlast = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	float ProjectileDamage = 20.F;
+
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	URadialForceComponent* RadialForceComponent = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	float DestroyDelay = 5.F;
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+
+	void OnTimerExpire();
+
 
 };

@@ -5,6 +5,7 @@
 #include "GameFramework/Pawn.h"
 #include "BattleTanks/Public/TankAimingComponent.h"
 #include "BattleTanks/Public/TankAIController.h"
+#include "GameFramework/Pawn.h"
 #include "Engine/World.h"
 
 void ATankAIController::BeginPlay()
@@ -27,7 +28,38 @@ void ATankAIController::Tick(float DeltaTime)
 		AimingComponent->AimAt(Forward<FVector&>(PlayerTank->GetActorLocation()));
 
 		// Fire if ready
-		AimingComponent->Fire();
+		if (AimingComponent->GetFiringStatus() == EFiringStatus::Locked)
+		{
+			AimingComponent->Fire();
+		}
 	}
 	
+}
+
+void ATankAIController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+	if (InPawn)
+	{
+		auto PossessedTank = Cast<ATank>(InPawn);
+		if (!ensure(PossessedTank))
+		{
+			return;
+		}
+
+		// Subsribe local method to tank death event
+		PossessedTank->OnDeathEvent.AddUObject(this, &ATankAIController::OnPossessedTankDeath);
+
+	}
+}
+
+void ATankAIController::OnPossessedTankDeath()
+{
+	if (!GetPawn() )
+	{
+		return;
+	}
+
+	GetPawn()->DetachFromControllerPendingDestroy();
+	UE_LOG(LogTemp, Warning, TEXT("Tank dies and detached!"));
 }

@@ -23,8 +23,14 @@ private:
 	virtual void Tick(float DeltaTime) override;
 
 	// This is the distance the tank will stop away from its goal
-	float AcceptanceRadius = 3000; // 30m
+	UPROPERTY(EditDefaultsOnly, Category = "Setup") // consiider EditDefaultsOnly
+	float AcceptanceRadius = 5000; // 30m
+
+	virtual void SetPawn(APawn* InPawn) override;
 
 	UTankAimingComponent* AimingComponent = nullptr;
+
+	UFUNCTION()
+	void OnPossessedTankDeath();
 
 };

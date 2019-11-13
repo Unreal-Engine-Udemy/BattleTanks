@@ -25,6 +25,9 @@ void ATankPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	AimTowardsCrossHair();
 
+	auto Tank = Cast<ATank>(GetPawn());
+	//Tank->OnDeathEvent.AddUObject(this, &ATankPlayerController::StartSpectatingOnly );
+
 }
 
 void ATankPlayerController::AimTowardsCrossHair()
@@ -54,6 +57,23 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector& OutHitLocation) cons
 		return true;
 	}
 	return false;
+}
+
+void ATankPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+	if (InPawn)
+	{
+		auto PossessedTank = Cast<ATank>(InPawn);
+		if (!ensure(PossessedTank))
+		{
+			return;
+		}
+
+		// Subsribe local method to tank death event
+		PossessedTank->OnDeathEvent.AddUObject(this, &ATankPlayerController::StartSpectatingOnly);
+
+	}
 }
 
 bool ATankPlayerController::GetLookVectorHitLocation(FVector& OutHitLocation, FVector* Direction, FVector* CameraWorldLocation) const

@@ -17,17 +17,15 @@ UTankAimingComponent::UTankAimingComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	static ConstructorHelpers::FObjectFinder<UClass> MyBPClass(TEXT("Class'/Game/Tank/Projectile_BP'"));
-	if (MyBPClass.Object != NULL)
-	{
-		ProjectileBlueprint = MyBPClass.Object;
-	}
-
 }
 
 void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	if ((FPlatformTime::Seconds() - LastFireTime) < ReloadTimeInSeconds)
+	if (AmmoCount == 0)
+	{
+		FiringStatus = EFiringStatus::OutOfAmmo;
+	}
+	else if ((FPlatformTime::Seconds() - LastFireTime) < ReloadTimeInSeconds)
 	{
 		FiringStatus = EFiringStatus::Reloading;
 	}
@@ -43,6 +41,7 @@ void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UTankAimingComponent::BeginPlay()
 {
+	Super::BeginPlay();
 	LastFireTime = FPlatformTime::Seconds();
 }
 
@@ -88,11 +87,16 @@ void UTankAimingComponent::Initialise(UTankBarrelComponent* BarrelToSet, UTankTu
 	Turret = TurretToSet;
 }
 
+EFiringStatus UTankAimingComponent::GetFiringStatus() const
+{
+	return FiringStatus;
+}
+
 bool UTankAimingComponent::IsBarrelMoving()
 {
 	if (!ensure(Barrel)) { return false; }
 
-	if (Barrel->GetForwardVector().Equals(LastAimingPosition, 0.001F))
+	if (Barrel->GetForwardVector().Equals(LastAimingPosition, 0.1F))
 	{
 		return false;
 	}
@@ -130,7 +134,7 @@ void UTankAimingComponent::MoveBarrelTowards(FVector& AimDirection)
 void UTankAimingComponent::Fire()
 {
 	
-	if (FiringStatus != EFiringStatus::Reloading)
+	if (FiringStatus != EFiringStatus::Reloading && FiringStatus != EFiringStatus::OutOfAmmo)
 	{
 		if (!ensure(Barrel)) return ;
 		if (!ensure(ProjectileBlueprint)) return;
@@ -141,5 +145,7 @@ void UTankAimingComponent::Fire()
 		Projectile->LaunchProjectile(Barrel->GetForwardVector(), LaunchSpeed);
 
 		LastFireTime = FPlatformTime::Seconds();
+		AmmoCount -= 1;
+
 	}
 }

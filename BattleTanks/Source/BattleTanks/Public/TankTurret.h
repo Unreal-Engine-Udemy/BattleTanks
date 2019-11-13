@@ -16,8 +16,6 @@ class BATTLETANKS_API UTankTurret : public UStaticMeshComponent
 
 public:
 
-	UTankTurret();
-
 	void Rotate(float DeltaRotate);
 	
 private:
