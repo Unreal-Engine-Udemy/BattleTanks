@@ -10,6 +10,7 @@ UTankTrack::UTankTrack()
 	UStaticMesh* Asset = MeshAsset.Object;
 
 	this->SetStaticMesh(Asset);
+	SetNotifyRigidBodyCollision(true); //set simulate generate hit events
 
 	PrimaryComponentTick.bCanEverTick = false;
 
@@ -24,8 +25,11 @@ void UTankTrack::BeginPlay()
 void UTankTrack::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Drive tracks
+	DriveTrack();
+
 	// Apply sideways force
 	ApplySidewaysForce();
+
 	CurrentThrottle = 0;
 }
 
@@ -53,7 +57,6 @@ void UTankTrack::ApplySidewaysForce()
 void UTankTrack::SetThrottle(float Throttle)
 {
 	CurrentThrottle = FMath::Clamp<float>(CurrentThrottle + Throttle, -1, +1);
-	DriveTrack();
 }
 
 void UTankTrack::DriveTrack()
